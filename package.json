@@ -1,6 +1,6 @@
 {
   "name": "tlpm-uav-mdf",
-  "version": "0.0.2",
+  "version": "0.1.2",
   "private": true,
   "productName": "基于无人机多模态数据融合的茶树小绿叶蝉虫害监测系统",
   "description": "基于无人机多模态数据融合的茶树小绿叶蝉虫害监测系统",
