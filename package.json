@@ -1,12 +1,22 @@
 {
   "name": "tlpm-uav-mdf",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "private": true,
-  "productName":"基于无人机多模态数据融合的茶树小绿叶蝉虫害监测系统",
+  "productName": "基于无人机多模态数据融合的茶树小绿叶蝉虫害监测系统",
   "description": "基于无人机多模态数据融合的茶树小绿叶蝉虫害监测系统",
   "main": "./electron/app.cjs",
   "build": {
-    "appId": "cn.xinghai2524.myapp",
+    "appId": "cn.xinghai2524.tlpm",
+    "asar": true,
+    "files": [
+      "**/*",
+      "public/**/*",
+      "logs/**/*"
+    ],
+    "asarUnpack": [
+      "public/**/*",
+      "logs/**/*"
+    ],
     "directories": {
       "output": "release"
     },
@@ -35,8 +45,13 @@
     "app:dist": "electron-builder"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.1.0",
+    "@tailwindcss/vite": "^4.1.17",
+    "onnxruntime-node": "^1.23.2",
     "onnxruntime-web": "^1.14.0",
     "pinia": "^3.0.1",
+    "tailwind-scrollbar": "^4.0.2",
+    "tailwindcss": "^4.1.17",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },

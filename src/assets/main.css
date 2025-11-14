@@ -1,5 +1,27 @@
-*{
-  padding:0;
-  margin:0;
+* {
+  font-family: 'Rajdhani', sans-serif;
   box-sizing: border-box;
 }
+
+/* 隐藏滚动条，但允许滚动 */
+*::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
+body {
+  overflow: auto; /* 或 overflow: scroll; */
+}
+
+@import 'tailwindcss';
+
+
+@theme {
+  --color-techBlue: #0a1929;
+  --color-techDark: #050f1a;
+  --color-techGreen: #39ff14;
+  --color-techCyan: #00f0ff;
+  --color-techPurple: #9d4edd;
+}
+
+@import '@fortawesome/fontawesome-free/css/all.css';
