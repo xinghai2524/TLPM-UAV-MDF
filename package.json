@@ -11,11 +11,10 @@
     "files": [
       "**/*",
       "public/**/*",
-      "logs/**/*"
+      "!test/**/*"
     ],
     "asarUnpack": [
-      "public/**/*",
-      "logs/**/*"
+      "public/**/*"
     ],
     "directories": {
       "output": "release"

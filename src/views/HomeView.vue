@@ -12,12 +12,12 @@ const canvas = ref(null)
 const video = ref(null)
 // input标签
 const fileInput = ref(null)
+// inputVideo标签
+const videoInput = ref(null)
 // 检测中间值
 const xyxyxyInfo = ref([])
 // 是否开启摄像头
 const mediaDeviceStart = ref(false)
-// steam
-const mediaDevice = ref(null)
 
 inference.setGlobalCanvas(canvas)
 inference.setGlobalxyxyxyInfo(xyxyxyInfo)
@@ -26,28 +26,48 @@ inference.setInferenceStatus(mediaDeviceStart)
 
 // 图片检测
 function inferenceImg(event) {
-  console.log("点击了图片检测")
+  // 如果正在视频检测
+  clearnCanvas()
   inference.sendImage(event.target.files[0])
-  fileInput.value.value = ""
+  fileInput.value.value = ''
 }
 
-// 视频检测
+// 摄像头检测
 function cotrolMediaDeviceInference() {
-  console.log("点击了",mediaDeviceStart.value)
   if (mediaDeviceStart.value) {
     mediaDeviceStart.value = false
   } else {
-    navigator.mediaDevices.getUserMedia({
-      video: { width: 1280, height: 720 },
-    }).then((stream)=>{
-      video.value.srcObject = stream
-      mediaDevice.value = stream
-    })
-    console.log("开始检测")
+    clearnCanvas()
+    navigator.mediaDevices
+      .getUserMedia({
+        video: { width: 1280, height: 720 },
+      })
+      .then((stream) => {
+        video.value.srcObject = stream
+      })
     mediaDeviceStart.value = true
     inference.sendFrame(video.value)
   }
 }
+
+// 视频检测
+function inferenceVideo(event) {
+  // 如果有视频在检测中
+  clearnCanvas()
+
+  // 如果没有内容就退出
+  if (!event.target.files[0]) {
+    return
+  }
+
+  mediaDeviceStart.value = true
+  video.value.src = URL.createObjectURL(event.target.files[0])
+  video.value.play()
+  inference.sendFrame(video.value)
+}
+
+
+
 
 // 显示关闭方框
 function selectRect(key) {
@@ -65,6 +85,17 @@ function allRect(key) {
   })
 }
 
+// 同意初始化canvas,清空video的函数
+function clearnCanvas() {
+  mediaDeviceStart.value = false
+  // 文件视频
+  video.value.removeAttribute('src')
+  // 摄像头视频
+  video.value.srcObject?.getTracks().forEach((track) => track.stop())
+  video.value.srcObject = undefined
+  video.value.load()
+}
+
 // 关闭系统
 function windowClose() {
   if (window.System != undefined) {
@@ -79,6 +110,7 @@ function windowClose() {
       style="display: none"
       class="w-[640px] h-[640px] bg-amber-500"
       ref="video"
+      @ended="mediaDeviceStart = false"
       autoplay
       id="video"
     ></video>
@@ -109,9 +141,7 @@ function windowClose() {
           </div>
           <div class="items-center gap-2 select-none hidden lg:flex">
             <i class="fa-solid fa-server text-techPurple"></i>
-            <span class="text-sm"
-              >检测模型: <span class="text-techCyan">YOLO11n-虫害专用版</span></span
-            >
+            <span class="text-sm">模型: <span class="text-techCyan">YOLO11n-虫害专用版</span></span>
           </div>
           <button
             class="bg-techGreen/10 hover:bg-techGreen/20 text-techGreen border border-techGreen/50 px-3 py-1 rounded transition-all"
@@ -162,19 +192,47 @@ function windowClose() {
                 停止检测
               </button>
 
+              <!-- 上传图片 -->
+              <input
+                class="hidden"
+                name="inputImage"
+                type="file"
+                ref="fileInput"
+                accept="image/*"
+                @change="inferenceImg"
+              />
+              <input
+                class="hidden"
+                name="inputVideo"
+                type="file"
+                ref="videoInput"
+                accept="video/*"
+                @change="inferenceVideo"
+              />
               <button
                 class="bg-gray-700/50 hover:bg-gray-700/70 text-gray-300 border border-gray-600 px-3 py-1 rounded text-sm transition-all"
-                @click="fileInput.click()"
+                @click.stop="
+                  () => {
+                    mediaDeviceStart = false
+                    videoInput.click()
+                    videoInput.value = ''
+                  }
+                "
+              >
+                <i class="fa-solid fa-file-video mr-1"></i>
+                上传视频
+              </button>
+
+              <button
+                class="bg-gray-700/50 hover:bg-gray-700/70 text-gray-300 border border-gray-600 px-3 py-1 rounded text-sm transition-all"
+                @click.stop="
+                  () => {
+                    fileInput.click()
+                    mediaDeviceStart = false
+                  }
+                "
               >
                 <i class="fa-solid fa-upload mr-1"></i>
-                <input
-                  class="hidden"
-                  name="inputImage"
-                  type="file"
-                  ref="fileInput"
-                  accept="image/*"
-                  @change="inferenceImg"
-                />
                 上传图像
               </button>
             </div>
@@ -220,7 +278,8 @@ function windowClose() {
                     ? 0
                     : +xyxyxyInfo.filter((event) => {
                         return event.conf < 0.3
-                      }).length / xyxyxyInfo.length).toFixed(2)
+                      }).length / xyxyxyInfo.length
+                  ).toFixed(2)
                 }}%
               </p>
             </div>
@@ -242,13 +301,25 @@ function windowClose() {
               <ListItem
                 v-if="!mediaDeviceStart"
                 v-for="(value, index) in xyxyxyInfo"
-                :xyxyxy="value"
+                :x1="value.x1"
+                :x2="value.x2"
+                :y1="value.y1"
+                :y2="value.y2"
+                :conf="value.conf"
+                :cls="value.cls"
                 :resultId="index"
                 @mouseenter="selectRect(index)"
               ></ListItem>
+
               <ListItem
                 v-if="mediaDeviceStart"
-                :xyxyxy="{ x1: 0, y1: 0, x2: 0, y2: 0, conf: 100, cls: 0 }"
+                :x1="0"
+                :x2="0"
+                :y1="0"
+                :y2="0"
+                :conf="1"
+                :cls="0"
+                :resultId="0"
               ></ListItem>
             </div>
           </div>

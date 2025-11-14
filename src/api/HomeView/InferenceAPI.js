@@ -1,3 +1,4 @@
+import { nextTick } from 'vue';
 
 // 逻辑抽离，接收canvas，video，image，xyxyxyInfo
 const isElectron = window.versions
@@ -24,18 +25,14 @@ export function setGlobalVideo(video) {
   globalVideo = video
 }
 
-
-
 export function stopInference() {
   inferenceStatus.value = false
 }
 
 
 if (isElectron == undefined) {
-  await import('./InferenceWork').then((module) => {
-    inference = new Worker(new URL("./InferenceWork.js", import.meta.url), { type: 'module' })
-    console.log('你在浏览器')
-  })
+  inference = new Worker(new URL("./InferenceWork.js", import.meta.url), { type: 'module' })
+  console.log('你在浏览器')
 } else {
   await import('./electronInference').then((module) => {
     inference = new module.Inference()
@@ -74,7 +71,7 @@ export async function sendImage(file) {
   globalImage.img = img
   globalImage.img_width = img.width
   globalImage.img_height = img.height
-  console.log("图片检测。。。")
+
   inference.postMessage([imageData, img.width, img.height, INPUT_WIDTH, INPUT_HEIGHT])
 }
 
@@ -94,20 +91,25 @@ export async function sendFrame(video) {
 
 // 回调函数
 onmessage((xyxyxy, img, img_width, img_height) => {
-  console.log("回调函数")
-  drawRect(img, img_width, img_height, xyxyxy)
+  nextTick(() => {
+    drawRect(img, img_width, img_height, xyxyxy)
+  })
+  // 等dom完成
 
+  // 查看可不可以开始检测
   if (inferenceStatus.value) {
     requestAnimationFrame(() => {
-      sendFrame(globalVideo.value)
+      nextTick(() => {
+        sendFrame(globalVideo.value)
+      })
     })
   }
+
 
 })
 
 // 检测后回调函数,用于更新UI信息
 function drawRect(img, img_width, img_height, xyxyxy) {
-  console.log(img_width, img_height)
   // 获取最长的边
   const proportion = 16 / 9
   let start_x
@@ -123,7 +125,6 @@ function drawRect(img, img_width, img_height, xyxyxy) {
     start_x = (globalCanvas.value.width - img_width) / 2
     start_y = 0
   }
-  console.log(globalCanvas.value.width, globalCanvas.value.height)
 
   const ctx = globalCanvas.value.getContext('2d')
 
