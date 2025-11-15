@@ -2,9 +2,7 @@
 const props = defineProps(['x1', 'y1', 'x2', 'y2', 'conf', 'cls', 'resultId'])
 
 const ClassNames = {
-  0: 'class1',
-  1: 'class2',
-  2: '小绿叶蝉',
+  0: '小绿叶蝉',
 }
 
 const topconf = ['bg-techGreen/20', 'text-techGreen']
@@ -14,7 +12,7 @@ const downconf = ['bg-techCyan/20', 'text-techCyan']
 <template>
   <div class="bg-black/30 rounded p-3 hover:bg-black transition-all MyTransform select-none">
     <div class="flex justify-between items-center mb-1">
-      <h3 class="text-white font-medium">{{ props.cls }} #{{ props.resultId }}</h3>
+      <h3 class="text-white font-medium">{{ ClassNames[props.cls] ?? props.cls }} #{{ props.resultId }}</h3>
       <span
         class="text-xs px-2 py-0.5 rounded-full"
         :class="[...(props.conf < 0.5 ? downconf : topconf)]"

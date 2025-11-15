@@ -114,7 +114,7 @@ function drawRect(img, img_width, img_height, xyxyxy) {
   const proportion = 16 / 9
   let start_x
   let start_y
-  if (img_width > img_height) {
+  if (img_width > img_height && img_height < (img_width / proportion)) {
     globalCanvas.value.width = img_width
     globalCanvas.value.height = img_width / proportion
     start_x = 0

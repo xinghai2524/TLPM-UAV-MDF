@@ -6,9 +6,9 @@ const path = require('path')
 // 初始化
 let modelPath = null;
 if (app.isPackaged) {
-  modelPath = path.join(process.resourcesPath, "app.asar.unpacked", "public", "yolo11n.onnx")
+  modelPath = path.join(process.resourcesPath, "app.asar.unpacked", "public", "TLPM-UAV-MDF.onnx")
 } else {
-  modelPath = path.join(__dirname, '../../public/yolo11n.onnx');
+  modelPath = path.join(__dirname, '../../public/TLPM-UAV-MDF.onnx');
 }
 
 let session = null
@@ -51,7 +51,7 @@ async function InferenceRun(event, float32Array, img_width, img_height, INPUT_WI
   const xyxyxy = [];
   for (let i = 0; i < result.dims[1]; i += 6) {
     let [x1, y1, x2, y2, conf, cls] = resultData.slice(i, i + 6);
-    if (conf < 0.25) {
+    if (conf < 0.2) {
       continue;
     }
     x1 = x1 * img_width / INPUT_WIDTH;

@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { ref, watch } from 'vue'
 import ListItem from '../components/HomeView/ListItem.vue'
 import RectDraw from '../components/HomeView/RectDraw.vue'
 import * as inference from '../api/HomeView/InferenceAPI.js'
@@ -66,9 +66,6 @@ function inferenceVideo(event) {
   inference.sendFrame(video.value)
 }
 
-
-
-
 // 显示关闭方框
 function selectRect(key) {
   xyxyxyInfo.value.forEach((value, index) => {
@@ -79,8 +76,9 @@ function selectRect(key) {
     }
   })
 }
-function allRect(key) {
-  xyxyxyInfo.value.forEach((value, index) => {
+
+function allRect() {
+  xyxyxyInfo.value.forEach((value) => {
     value.isShow = true
   })
 }
@@ -95,6 +93,13 @@ function clearnCanvas() {
   video.value.srcObject = undefined
   video.value.load()
 }
+
+// 监听如果停止就暂停播放视频
+watch(mediaDeviceStart, (newVal) => {
+  if (newVal == false) {
+    video.value.pause()
+  }
+})
 
 // 关闭系统
 function windowClose() {

@@ -9,7 +9,7 @@ ort.env.wasm.wasmPaths = {
 }
 
 // 创建模型
-const model = new URL('../../../public/yolo11n.onnx', import.meta.url).pathname;
+const model = new URL('../../../public/TLPM-UAV-MDF.onnx', import.meta.url).pathname;
 const Globalsession = await ort.InferenceSession.create(model)
 
 
@@ -51,7 +51,7 @@ export class Inference {
     const xyxyxy = [];
     for (let i = 0; i < result.dims[1]; i += 6) {
       let [x1, y1, x2, y2, conf, cls] = resultData.slice(i, i + 6);
-      if (conf < 0.25) {
+      if (conf < 0.2) {
         continue;
       }
       x1 = x1 * img_width / INPUT_WIDTH;

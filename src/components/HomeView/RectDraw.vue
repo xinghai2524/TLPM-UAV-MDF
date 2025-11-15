@@ -1,5 +1,8 @@
 <script setup>
 const props = defineProps(['x1', 'y1', 'x2', 'y2', 'conf', 'cls', 'isShow'])
+const ClassNames = {
+  0: '小绿叶蝉',
+}
 </script>
 
 <template>
@@ -7,9 +10,9 @@ const props = defineProps(['x1', 'y1', 'x2', 'y2', 'conf', 'cls', 'isShow'])
     v-show="props.isShow"
     :style="{ top: `${props.y1 - 4.5}%`, left: `${props.x1}%` }"
     class="absolute bg-techGreen/90 text-black text-xs px-1 rounded font-thin"
-    :title="`${props.cls} (置信度: ${props.conf.toFixed(2)})`"
+    :title="`${ClassNames[props.cls] ?? props.cls} (置信度: ${props.conf.toFixed(2)})`"
   >
-    {{ props.cls }} {{ props.conf.toFixed(2) }}
+    {{ ClassNames[props.cls] ?? props.cls }} {{ props.conf.toFixed(2) }}
   </div>
   <div
     v-show="props.isShow"
